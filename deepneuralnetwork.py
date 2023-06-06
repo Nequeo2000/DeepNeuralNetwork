@@ -72,16 +72,3 @@ class DeepNeuralNetwork:
         error = numpy.array( errors[0].flatten().tolist()[0:-1] ,ndmin=2)
         alpha = self.lr*error*gradient
         self.weights[0] += numpy.matmul(input.T,alpha)
-
-
-nn = DeepNeuralNetwork(nodes=[2,5,3,2],
-                        learningrate=0.1,
-                        activations=[activationfunction.Sigmoid,
-                                     activationfunction.ReLu,
-                                     activationfunction.Softmax])
-
-# training the network
-nn.fit([0,1],[1,0])
-
-# get prediction from network
-print( nn.predict([0,1]) )
