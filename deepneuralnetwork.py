@@ -1,6 +1,9 @@
 import numpy
 import math
-import activationfunction
+try:
+    import DeepNeuralNetwork.activationfunction
+except ImportError:
+    import activationfunction
 
 class DeepNeuralNetwork:
     def __init__(self,nodes,learningrate=None,activations=None):
