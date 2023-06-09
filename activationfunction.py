@@ -41,7 +41,7 @@ class LeakyReLu:
     
     @staticmethod
     def getStochasticGradient(matrix):
-        return matrix[0][0]*(-LeakyReLu.alpha) if matrix[0][0]<0 else matrix[0][0]
+        return LeakyReLu.alpha if matrix[0][0]<0 else matrix[0][0]
 
 class Softmax:
     @staticmethod
