@@ -47,7 +47,7 @@ def StochasticGradientDecent(NN, input, expectedOutput):
     alpha = NN.lr*error*gradient
     NN.weights[0] += numpy.matmul(input.T,alpha)
 
-    return errors[-1] # return error of input of input layer
+    return errors[-1] # return error of output layer
 
 def GradientDecent(NN, input, expectedOutput):
     input = addBias(input)
@@ -90,4 +90,4 @@ def GradientDecent(NN, input, expectedOutput):
     alpha = NN.lr*numpy.matmul(error,gradient)
     NN.weights[0] += numpy.matmul(input.T,alpha)
 
-    return errors[-1] # return error of input of input layer
+    return errors[-1] # return error of output layer
