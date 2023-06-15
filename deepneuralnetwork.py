@@ -18,7 +18,7 @@ class DeepNeuralNetwork:
             self.weights.append(layerWeights)
         
         self.activationfunctions = (len(nodes)-2)*[activationfunction.Sigmoid]+[activationfunction.Softmax] if activations==None else activations
-        self.optimization = optimizationfunction.StochasticGradientDecent if optimization == None else optimization
+        self.optimization = optimizationfunction.GradientDecent if optimization == None else optimization
 
     def setLearningrate(self,lr):
         self.lr = lr
