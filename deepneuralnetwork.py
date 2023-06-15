@@ -1,11 +1,11 @@
 import numpy
 import math
 try:
-    import DeepNeuralNetwork.activationfunction
+    import DeepNeuralNetwork.activationfunction as activationfunction
 except ImportError:
     import activationfunction
 try:
-    import DeepNeuralNetwork.optimization
+    import DeepNeuralNetwork.optimizationfunction as optimizationfunction
 except ImportError:
     import optimizationfunction
 
@@ -19,6 +19,12 @@ class DeepNeuralNetwork:
         
         self.activationfunctions = (len(nodes)-2)*[activationfunction.Sigmoid]+[activationfunction.Softmax] if activations==None else activations
         self.optimization = optimizationfunction.StochasticGradientDecent if optimization == None else optimization
+
+    def setLearningrate(self,lr):
+        self.lr = lr
+
+    def getLearningrate(self):
+        return self.lr
 
     def predict(self,input):
         input = optimizationfunction.addBias(input)
@@ -34,4 +40,4 @@ class DeepNeuralNetwork:
         return output.flatten()
     
     def fit(self,input, expectedOutput):
-        self.optimization(NN=self, input=input, expectedOutput=expectedOutput)
+        return self.optimization(NN=self, input=input, expectedOutput=expectedOutput)

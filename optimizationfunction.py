@@ -3,9 +3,7 @@ import numpy
 def addBias(array):
     if isinstance(array,numpy.ndarray):
         array = array.flatten().tolist()
-    array.append(1)
-
-    return numpy.array(array,ndmin=2)
+    return numpy.array(array+[1],ndmin=2)
 
 def StochasticGradientDecent(NN, input, expectedOutput):
     input = addBias(input)
@@ -47,7 +45,7 @@ def StochasticGradientDecent(NN, input, expectedOutput):
     alpha = NN.lr*error*gradient
     NN.weights[0] += numpy.matmul(input.T,alpha)
 
-    return errors[-1] # return error of output layer
+    return errors
 
 def GradientDecent(NN, input, expectedOutput):
     input = addBias(input)
@@ -90,4 +88,4 @@ def GradientDecent(NN, input, expectedOutput):
     alpha = NN.lr*numpy.matmul(error,gradient)
     NN.weights[0] += numpy.matmul(input.T,alpha)
 
-    return errors[-1] # return error of output layer
+    return errors
