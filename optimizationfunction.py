@@ -25,23 +25,24 @@ def StochasticGradientDecent(NN, input, expectedOutput):
     errors = []
     error = numpy.subtract(expectedOutput,output)
     errors.append(error)
-    for i in range(len(outputs)-1,0,-1):
+    for i in range(len(outputs)-1,-1,-1):
         # take out bias error for error calculation
         error = numpy.array( error.flatten().tolist()[0:NN.weights[i].shape[1]] ,ndmin=2)
         error = numpy.matmul( error, NN.weights[i].T )
         errors.append(error)
     errors.reverse()
+    errors[0] = numpy.array( errors[0].flatten().tolist()[0:-1] ,ndmin=2)
 
     # apply errors to weights
     for i in range(len(NN.weights)-1,0,-1):
         gradient = NN.activationfunctions[i].getStochasticGradient(outputs[i])
         if i < len(NN.weights)-1:
-            error = numpy.array( errors[i].flatten().tolist()[0:-1] ,ndmin=2)
-        else: error = errors[i]
+            error = numpy.array( errors[i+1].flatten().tolist()[0:-1] ,ndmin=2)
+        else: error = errors[i+1]
         alpha = NN.lr*error*gradient
         NN.weights[i] += numpy.matmul(outputs[i-1].T,alpha)
     gradient = NN.activationfunctions[0].getStochasticGradient(outputs[0])
-    error = numpy.array( errors[0].flatten().tolist()[0:-1] ,ndmin=2)
+    error = numpy.array( errors[0+1].flatten().tolist()[0:-1] ,ndmin=2)
     alpha = NN.lr*error*gradient
     NN.weights[0] += numpy.matmul(input.T,alpha)
 
@@ -67,24 +68,25 @@ def GradientDecent(NN, input, expectedOutput):
     errors = []
     error = numpy.subtract(expectedOutput,output)
     errors.append(error)
-    for i in range(len(outputs)-1,0,-1):
+    for i in range(len(outputs)-1,-1,-1):
         # take out bias error for error calculation
         error = numpy.array( error.flatten().tolist()[0:NN.weights[i].shape[1]] ,ndmin=2)
         error = numpy.matmul( error, NN.weights[i].T )
         errors.append(error)
     errors.reverse()
+    errors[0] = numpy.array( errors[0].flatten().tolist()[0:-1] ,ndmin=2)
 
     # apply errors to weights
     for i in range(len(NN.weights)-1,0,-1):
         relevantOutput = outputs[i] if i == len(NN.weights)-1 else numpy.delete(outputs[i], outputs[i].shape[1]-1,1)
         gradient = NN.activationfunctions[i].getGradientMatrix( relevantOutput )
         if i < len(NN.weights)-1:
-            error = numpy.array( errors[i].flatten().tolist()[0:-1] ,ndmin=2)
-        else: error = errors[i]
+            error = numpy.array( errors[i+1].flatten().tolist()[0:-1] ,ndmin=2)
+        else: error = errors[i+1]
         alpha = NN.lr*numpy.matmul(error,gradient)
         NN.weights[i] += numpy.matmul(outputs[i-1].T,alpha)
     gradient = NN.activationfunctions[0].getGradientMatrix( numpy.array(outputs[0][0][0:-1], ndmin=2) )
-    error = numpy.array( errors[0].flatten().tolist()[0:-1] ,ndmin=2)
+    error = numpy.array( errors[0+1].flatten().tolist()[0:-1] ,ndmin=2)
     alpha = NN.lr*numpy.matmul(error,gradient)
     NN.weights[0] += numpy.matmul(input.T,alpha)
 

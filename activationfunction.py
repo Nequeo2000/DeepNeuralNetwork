@@ -4,14 +4,15 @@ import math
 
 class Sigmoid:
     @staticmethod
-    def calc(matrix):
+    def calc(matrix: numpy.matrix):
         return scipy.special.expit(matrix)
     
     @staticmethod
-    def getStochasticGradient(matrix):
+    def getStochasticGradient(matrix: numpy.matrix):
         return matrix[0][0]*(1-matrix[0][0])
     
-    def getGradientMatrix(matrix):
+    @staticmethod
+    def getGradientMatrix(matrix: numpy.matrix):
         gradients = []
         for v in matrix[0]:
             gradients.append( Sigmoid.getStochasticGradient([[v]]) )
@@ -23,14 +24,15 @@ class Sigmoid:
     
 class Tanh:
     @staticmethod
-    def calc(matrix):
+    def calc(matrix: numpy.matrix):
         return numpy.tanh(matrix)
     
     @staticmethod
-    def getStochasticGradient(matrix):
+    def getStochasticGradient(matrix: numpy.matrix):
         return 1-math.pow(math.tanh(matrix[0][0]),2)
     
-    def getGradientMatrix(matrix):
+    @staticmethod
+    def getGradientMatrix(matrix: numpy.matrix):
         gradients = []
         for v in matrix[0]:
             gradients.append( Tanh.getStochasticGradient([[v]]) )
@@ -42,14 +44,15 @@ class Tanh:
     
 class ReLu:
     @staticmethod
-    def calc(matrix):
+    def calc(matrix: numpy.matrix):
         return numpy.maximum(matrix,0)
     
     @staticmethod
-    def getStochasticGradient(matrix):
+    def getStochasticGradient(matrix: numpy.matrix):
         return 0 if matrix[0][0]<0 else matrix[0][0]
     
-    def getGradientMatrix(matrix):
+    @staticmethod
+    def getGradientMatrix(matrix: numpy.matrix):
         gradients = []
         for v in matrix[0]:
             gradients.append( ReLu.getStochasticGradient([[v]]) )
@@ -62,18 +65,19 @@ class ReLu:
 class LeakyReLu:
     alpha = 0.1
     @staticmethod
-    def setAlpha(alpha):
+    def setAlpha(alpha: float):
         LeakyReLu.alpha = alpha
 
     @staticmethod
-    def calc(matrix):
+    def calc(matrix: numpy.matrix):
         return numpy.where(matrix>0, matrix, matrix*LeakyReLu.alpha)
     
     @staticmethod
-    def getStochasticGradient(matrix):
+    def getStochasticGradient(matrix: numpy.matrix):
         return LeakyReLu.alpha if matrix[0][0]<0 else matrix[0][0]
     
-    def getGradientMatrix(matrix):
+    @staticmethod
+    def getGradientMatrix(matrix: numpy.matrix):
         gradients = []
         for v in matrix[0]:
             gradients.append( LeakyReLu.getStochasticGradient([[v]]) )
@@ -85,14 +89,15 @@ class LeakyReLu:
 
 class Softmax:
     @staticmethod
-    def calc(matrix):
+    def calc(matrix: numpy.matrix):
         return scipy.special.softmax(matrix,axis=1)
     
     @staticmethod
-    def getStochasticGradient(matrix):
+    def getStochasticGradient(matrix: numpy.matrix):
         return 1 # will look into derivative of softmax another time
     
-    def getGradientMatrix(matrix):
+    @staticmethod
+    def getGradientMatrix(matrix: numpy.matrix):
         gradients = []
         for v in matrix[0]:
             gradients.append( Softmax.getStochasticGradient([[v]]) )

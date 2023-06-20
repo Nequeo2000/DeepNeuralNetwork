@@ -10,7 +10,10 @@ except ImportError:
     import optimizationfunction
 
 class DeepNeuralNetwork:
-    def __init__(self,nodes,learningrate=None,activations=None,optimization=None):
+    def __init__(self, nodes: "list[int]", 
+                 learningrate: float, 
+                 activations: list, 
+                 optimization: list):
         self.lr = 1/math.sqrt(max(nodes)) if learningrate==None else learningrate
         self.weights = []
         for i in range(len(nodes)-1):
@@ -20,13 +23,19 @@ class DeepNeuralNetwork:
         self.activationfunctions = (len(nodes)-2)*[activationfunction.Sigmoid]+[activationfunction.Softmax] if activations==None else activations
         self.optimization = optimizationfunction.GradientDecent if optimization == None else optimization
 
-    def setLearningrate(self,lr):
+    def setLearningrate(self, lr:float):
         self.lr = lr
 
-    def getLearningrate(self):
+    def getLearningrate(self) -> float:
         return self.lr
+    
+    def setWeights(self, weights: "list[list[float]]"):
+        self.weights = weights
 
-    def predict(self,input):
+    def getWeights(self) -> "list[list[float]]":
+        return self.weights
+
+    def predict(self, input: "list[float]") -> "list[float]":
         input = optimizationfunction.addBias(input)
         
         output = numpy.matmul(input,self.weights[0])
@@ -39,5 +48,5 @@ class DeepNeuralNetwork:
 
         return output.flatten()
     
-    def fit(self,input, expectedOutput):
+    def fit(self, input: "list[float]", expectedOutput: "list[float]") -> "list[list[float]]":
         return self.optimization(NN=self, input=input, expectedOutput=expectedOutput)
