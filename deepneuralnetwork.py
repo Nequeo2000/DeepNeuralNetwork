@@ -1,5 +1,6 @@
 import numpy
 import math
+import random
 try:
     import DeepNeuralNetwork.activationfunction as activationfunction
 except ImportError:
@@ -11,9 +12,10 @@ except ImportError:
 
 class DeepNeuralNetwork:
     def __init__(self, nodes: "list[int]", 
-                 learningrate: float, 
-                 activations: list, 
-                 optimization: list):
+                 learningrate = None,
+                 layerNormalization = False, 
+                 activations = None, 
+                 optimization = None,):
         self.lr = 1/math.sqrt(max(nodes)) if learningrate==None else learningrate
         self.weights = []
         for i in range(len(nodes)-1):
@@ -22,6 +24,7 @@ class DeepNeuralNetwork:
         
         self.activationfunctions = (len(nodes)-2)*[activationfunction.Sigmoid]+[activationfunction.Softmax] if activations==None else activations
         self.optimization = optimizationfunction.GradientDecent if optimization == None else optimization
+        self.layerNormalization = layerNormalization
 
     def setLearningrate(self, lr:float):
         self.lr = lr
@@ -49,4 +52,7 @@ class DeepNeuralNetwork:
         return output.flatten()
     
     def fit(self, input: "list[float]", expectedOutput: "list[float]") -> "list[list[float]]":
-        return self.optimization(NN=self, input=input, expectedOutput=expectedOutput)
+        errors = self.optimization(NN=self, input=input, expectedOutput=expectedOutput)
+        if self.layerNormalization:
+            optimizationfunction.layerNormalization(self.weights)
+        return errors

@@ -1,4 +1,17 @@
 import numpy
+import math
+
+def layerNormalization(layerWeights: numpy.matrix):
+    for i in range(len(layerWeights)):
+        weights = layerWeights[i].flatten().tolist()
+        mean = numpy.sum(weights)/len(weights)
+        variance = 0
+        for y in range(len(weights)):
+            variance += math.pow((weights[y]-mean),2)
+        variance = math.sqrt(variance/len(weights))
+        stdDeviantion = math.sqrt(variance)
+
+        layerWeights[i] = (layerWeights[i]-mean)/stdDeviantion
 
 def addBias(array):
     if isinstance(array,numpy.ndarray):
