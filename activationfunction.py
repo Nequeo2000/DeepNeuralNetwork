@@ -42,7 +42,7 @@ class Tanh:
         
         return gradientMarix
     
-class ReLu:
+class ReLU:
     @staticmethod
     def calc(matrix: numpy.matrix):
         return numpy.maximum(matrix,0)
@@ -55,32 +55,32 @@ class ReLu:
     def getGradientMatrix(matrix: numpy.matrix):
         gradients = []
         for v in matrix[0]:
-            gradients.append( ReLu.getStochasticGradient([[v]]) )
+            gradients.append( ReLU.getStochasticGradient([[v]]) )
 
         gradientMarix = numpy.zeros(shape=(matrix.shape[1],matrix.shape[1]), dtype=float)
         numpy.fill_diagonal(gradientMarix,gradients)
         
         return gradientMarix
     
-class LeakyReLu:
+class LeakyReLU:
     alpha = 0.1
     @staticmethod
     def setAlpha(alpha: float):
-        LeakyReLu.alpha = alpha
+        LeakyReLU.alpha = alpha
 
     @staticmethod
     def calc(matrix: numpy.matrix):
-        return numpy.where(matrix>0, matrix, matrix*LeakyReLu.alpha)
+        return numpy.where(matrix>0, matrix, matrix*LeakyReLU.alpha)
     
     @staticmethod
     def getStochasticGradient(matrix: numpy.matrix):
-        return LeakyReLu.alpha if matrix[0][0]<0 else matrix[0][0]
+        return LeakyReLU.alpha if matrix[0][0]<0 else matrix[0][0]
     
     @staticmethod
     def getGradientMatrix(matrix: numpy.matrix):
         gradients = []
         for v in matrix[0]:
-            gradients.append( LeakyReLu.getStochasticGradient([[v]]) )
+            gradients.append( LeakyReLU.getStochasticGradient([[v]]) )
 
         gradientMarix = numpy.zeros(shape=(matrix.shape[1],matrix.shape[1]), dtype=float)
         numpy.fill_diagonal(gradientMarix,gradients)
@@ -108,4 +108,4 @@ class Softmax:
         return gradientMarix
 
 def getActivationFunctions():
-    return [Sigmoid,Tanh,ReLu,LeakyReLu,Softmax]
+    return [Sigmoid,Tanh,ReLU,LeakyReLU,Softmax]

@@ -1,17 +1,11 @@
 import numpy
 import math
 
-def layerNormalization(layerWeights: numpy.matrix):
-    for i in range(len(layerWeights)):
-        weights = layerWeights[i].flatten().tolist()
-        mean = numpy.sum(weights)/len(weights)
-        variance = 0
-        for y in range(len(weights)):
-            variance += math.pow((weights[y]-mean),2)
-        variance = math.sqrt(variance/len(weights))
-        stdDeviantion = math.sqrt(variance)
-
-        layerWeights[i] = (layerWeights[i]-mean)/stdDeviantion
+def layerNormalization(values: numpy.matrix):
+    mean = numpy.mean(values)
+    stdDeviation = numpy.std(values)
+    values = (values-mean)/stdDeviation
+    return values
 
 def addBias(array):
     if isinstance(array,numpy.ndarray):
@@ -25,13 +19,17 @@ def StochasticGradientDecent(NN, input, expectedOutput):
     # calculate output of each layer
     outputs = []
     output = numpy.matmul(input,NN.weights[0])
+    output = layerNormalization(output) if NN.layerNormalization else output
     output = NN.activationfunctions[0].calc(output)
     output = addBias(output)
     outputs.append(output)
     for i in range(1,len(NN.weights)):
         output = numpy.matmul(output,NN.weights[i])
+        if NN.layerNormalization and i < len(NN.weights)-1:
+            output = layerNormalization(output)
         output = NN.activationfunctions[i].calc(output)
-        output = addBias(output) if i < len(NN.weights)-1 else output
+        if i < len(NN.weights)-1:
+            output = addBias(output)
         outputs.append(output)
     
     # calculate errors for each layer
@@ -68,13 +66,17 @@ def GradientDecent(NN, input, expectedOutput):
     # calculate output of each layer
     outputs = []
     output = numpy.matmul(input,NN.weights[0])
+    output = layerNormalization(output) if NN.layerNormalization else output
     output = NN.activationfunctions[0].calc(output)
     output = addBias(output)
     outputs.append(output)
     for i in range(1,len(NN.weights)):
         output = numpy.matmul(output,NN.weights[i])
+        if NN.layerNormalization and i < len(NN.weights)-1:
+            output = layerNormalization(output)
         output = NN.activationfunctions[i].calc(output)
-        output = addBias(output) if i < len(NN.weights)-1 else output
+        if i < len(NN.weights)-1:
+            output = addBias(output)
         outputs.append(output)
     
     # calculate errors for each layer

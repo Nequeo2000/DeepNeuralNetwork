@@ -42,17 +42,44 @@ class DeepNeuralNetwork:
         input = optimizationfunction.addBias(input)
         
         output = numpy.matmul(input,self.weights[0])
+        if self.layerNormalization:
+            output = optimizationfunction.layerNormalization(output)
         output = self.activationfunctions[0].calc(output)
         output = optimizationfunction.addBias(output)
         for i in range(1,len(self.weights)):            
             output = numpy.matmul(output,self.weights[i])
+            if self.layerNormalization and i < len(self.weights)-1:
+                output = optimizationfunction.layerNormalization(output)
             output = self.activationfunctions[i].calc(output)
             output = optimizationfunction.addBias(output) if i < len(self.weights)-1 else output
 
         return output.flatten()
     
     def fit(self, input: "list[float]", expectedOutput: "list[float]") -> "list[list[float]]":
-        errors = self.optimization(NN=self, input=input, expectedOutput=expectedOutput)
-        if self.layerNormalization:
-            optimizationfunction.layerNormalization(self.weights)
-        return errors
+        return self.optimization(NN=self, input=input, expectedOutput=expectedOutput)
+
+class GenerativeAdverserialNetwork:
+    def __init__(self, generatorNodes: "list[int]", 
+                 discriminatorNodes: "list[int]",
+                 learningrates=None, 
+                 activations=None):
+        self.generator = DeepNeuralNetwork(nodes=generatorNodes,
+                                           learningrate=learningrates[0] if learningrates != None else None,
+                                           layerNormalization=True,
+                                           activations=(len(generatorNodes)-2)*[activationfunction.Tanh]+[activationfunction.Sigmoid] if activations == None else activations[0])
+        
+        self.discriminator = DeepNeuralNetwork(discriminatorNodes, 
+                                               learningrate=learningrates[1] if learningrates != None else None,
+                                               layerNormalization=True,
+                                               activations=None if activations == None else activations[1])
+        self.generator.setLearningrate( self.generator.getLearningrate()*-1 )
+
+    def generate(self, input: "list[float]"):
+        return self.generator.predict(input)
+    
+    def fit(self, input: "list[float]"):
+        generatorInput = [random.random()]
+
+        self.discriminator.fit(input=input, expectedOutput=[1,0])
+        errors = self.discriminator.fit(input=self.generate( generatorInput ), expectedOutput=[0,1])
+        self.generator.fit(input=generatorInput, expectedOutput=input+errors[0])
