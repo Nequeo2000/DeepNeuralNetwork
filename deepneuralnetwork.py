@@ -1,6 +1,5 @@
 import numpy
 import math
-import random
 try:
     import DeepNeuralNetwork.activationfunction as activationfunction
 except ImportError:
@@ -40,7 +39,7 @@ class DeepNeuralNetwork:
 
     def predict(self, input: "list[float]") -> "list[float]":
         input = optimizationfunction.addBias(input)
-        
+
         output = numpy.matmul(input,self.weights[0])
         if self.layerNormalization:
             output = optimizationfunction.layerNormalization(output)
@@ -78,7 +77,7 @@ class GenerativeAdverserialNetwork:
         return self.generator.predict(input)
     
     def fit(self, input: "list[float]"):
-        generatorInput = [random.random()]
+        generatorInput = numpy.random.uniform(-1,1,size=(1,self.generator.weights[0].shape[0]-1))
 
         self.discriminator.fit(input=input, expectedOutput=[1,0])
         errors = self.discriminator.fit(input=self.generate( generatorInput ), expectedOutput=[0,1])
