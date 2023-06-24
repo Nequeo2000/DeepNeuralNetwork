@@ -12,6 +12,7 @@ except ImportError:
 class DeepNeuralNetwork:
     def __init__(self, nodes: "list[int]", 
                  learningrate = None,
+                 useBias = False,
                  layerNormalization = False, 
                  activations = None, 
                  optimization = None,):
@@ -21,9 +22,11 @@ class DeepNeuralNetwork:
             layerWeights = numpy.random.uniform(-1,1,size=(nodes[i]+1,nodes[i+1]))
             self.weights.append(layerWeights)
         
+        self.useBias = useBias
+        self.layerNormalization = layerNormalization
+        
         self.activationfunctions = (len(nodes)-2)*[activationfunction.Sigmoid]+[activationfunction.Softmax] if activations==None else activations
         self.optimization = optimizationfunction.GradientDecent if optimization == None else optimization
-        self.layerNormalization = layerNormalization
 
     def setLearningrate(self, lr:float):
         self.lr = lr
@@ -38,19 +41,18 @@ class DeepNeuralNetwork:
         return self.weights
 
     def predict(self, input: "list[float]") -> "list[float]":
-        input = optimizationfunction.addBias(input)
+        input = optimizationfunction.addBias(self,input)
 
         output = numpy.matmul(input,self.weights[0])
-        if self.layerNormalization:
-            output = optimizationfunction.layerNormalization(output)
+        output = optimizationfunction.layerNormalization(self,output)
         output = self.activationfunctions[0].calc(output)
-        output = optimizationfunction.addBias(output)
+        output = optimizationfunction.addBias(self,output)
         for i in range(1,len(self.weights)):            
             output = numpy.matmul(output,self.weights[i])
-            if self.layerNormalization and i < len(self.weights)-1:
-                output = optimizationfunction.layerNormalization(output)
+            if i < len(self.weights)-1:
+                output = optimizationfunction.layerNormalization(self,output)
             output = self.activationfunctions[i].calc(output)
-            output = optimizationfunction.addBias(output) if i < len(self.weights)-1 else output
+            output = optimizationfunction.addBias(self,output) if i < len(self.weights)-1 else output
 
         return output.flatten()
     
@@ -64,11 +66,13 @@ class GenerativeAdverserialNetwork:
                  activations=None):
         self.generator = DeepNeuralNetwork(nodes=generatorNodes,
                                            learningrate=learningrates[0] if learningrates != None else None,
+                                           useBias=True,
                                            layerNormalization=True,
                                            activations=(len(generatorNodes)-2)*[activationfunction.Tanh]+[activationfunction.Sigmoid] if activations == None else activations[0])
         
         self.discriminator = DeepNeuralNetwork(discriminatorNodes, 
                                                learningrate=learningrates[1] if learningrates != None else None,
+                                               useBias=True,
                                                layerNormalization=True,
                                                activations=None if activations == None else activations[1])
         self.generator.setLearningrate( self.generator.getLearningrate()*-1 )
