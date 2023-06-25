@@ -68,21 +68,33 @@ class GenerativeAdverserialNetwork:
                                            learningrate=learningrates[0] if learningrates != None else None,
                                            useBias=True,
                                            layerNormalization=True,
-                                           activations=(len(generatorNodes)-2)*[activationfunction.Tanh]+[activationfunction.Sigmoid] if activations == None else activations[0])
+                                           activations=(len(generatorNodes)-1)*[activationfunction.Tanh] if activations == None else activations[0])
         
         self.discriminator = DeepNeuralNetwork(discriminatorNodes, 
                                                learningrate=learningrates[1] if learningrates != None else None,
                                                useBias=True,
                                                layerNormalization=True,
                                                activations=None if activations == None else activations[1])
-        self.generator.setLearningrate( self.generator.getLearningrate()*-1 )
 
     def generate(self, input: "list[float]"):
         return self.generator.predict(input)
     
     def fit(self, input: "list[float]"):
+        self.fitDiscriminator(input=input)
+        self.fitGenerator(input=input)
+
+    def fitDiscriminator(self, input: "list[float]"):
         generatorInput = numpy.random.uniform(-1,1,size=(1,self.generator.weights[0].shape[0]-1))
 
         self.discriminator.fit(input=input, expectedOutput=[1,0])
-        errors = self.discriminator.fit(input=self.generate( generatorInput ), expectedOutput=[0,1])
-        self.generator.fit(input=generatorInput, expectedOutput=input+errors[0])
+        self.discriminator.fit(input=self.generate(generatorInput), expectedOutput=[0,1])
+
+    def fitGenerator(self, input: "list[float]"):
+        generatorInput = numpy.random.uniform(-1,1,size=(1,self.generator.weights[0].shape[0]-1))
+        generatedOutput = self.generate(generatorInput)
+
+        discLr = self.discriminator.getLearningrate()
+        self.discriminator.setLearningrate(0)
+        errors = self.discriminator.fit(input=generatedOutput, expectedOutput=[1,0])
+        self.generator.fit(input=generatorInput, expectedOutput=generatedOutput+errors[0])
+        self.discriminator.setLearningrate(discLr)
