@@ -21,6 +21,7 @@ from DeepNeuralNetwork import optimizationfunction
 
 nn = DeepNeuralNetwork(nodes=[2,5,3,2],
                         learningrate=0.1,
+                        useBias=True,
                         layerNormalization=True,
                         activations=[activationfunction.Sigmoid,
                                      activationfunction.ReLU,

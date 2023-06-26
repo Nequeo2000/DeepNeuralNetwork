@@ -68,12 +68,14 @@ class GenerativeAdverserialNetwork:
                                            learningrate=learningrates[0] if learningrates != None else None,
                                            useBias=True,
                                            layerNormalization=True,
+                                           optimization=optimizationfunction.GradientDecent,
                                            activations=(len(generatorNodes)-1)*[activationfunction.Tanh] if activations == None else activations[0])
         
         self.discriminator = DeepNeuralNetwork(discriminatorNodes, 
                                                learningrate=learningrates[1] if learningrates != None else None,
                                                useBias=True,
                                                layerNormalization=True,
+                                               optimization=optimizationfunction.GradientDecent,
                                                activations=None if activations == None else activations[1])
 
     def generate(self, input: "list[float]"):

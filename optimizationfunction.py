@@ -98,15 +98,19 @@ def GradientDecent(NN, input, expectedOutput):
     # apply errors to weights
     for i in range(len(NN.weights)-1,0,-1):
         relevantOutput = outputs[i] if i == len(NN.weights)-1 else numpy.delete(outputs[i], outputs[i].shape[1]-1,1)
-        gradient = NN.activationfunctions[i].getGradientMatrix( relevantOutput )
+        gradients = NN.activationfunctions[i].getGradientArray(relevantOutput)
         if i < len(NN.weights)-1:
             error = numpy.array( errors[i+1].flatten().tolist()[0:-1] ,ndmin=2)
         else: error = errors[i+1]
-        alpha = NN.lr*numpy.matmul(error,gradient)
+        alpha = NN.lr*error
+        for y in range(alpha.shape[0]):
+            alpha[y] = alpha[y]*gradients[y]
         NN.weights[i] += numpy.matmul(outputs[i-1].T,alpha)
-    gradient = NN.activationfunctions[0].getGradientMatrix( numpy.array(outputs[0][0][0:-1], ndmin=2) )
+    gradients = NN.activationfunctions[0].getGradientArray( numpy.array(outputs[0][0][0:-1], ndmin=2) )
     error = numpy.array( errors[0+1].flatten().tolist()[0:-1] ,ndmin=2)
-    alpha = NN.lr*numpy.matmul(error,gradient)
+    alpha = NN.lr*error
+    for y in range(alpha.shape[0]):
+        alpha[y] = alpha[y]*gradients[y]
     NN.weights[0] += numpy.matmul(input.T,alpha)
 
     return errors
