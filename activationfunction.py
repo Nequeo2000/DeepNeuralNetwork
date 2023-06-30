@@ -92,5 +92,5 @@ class Softmax:
 
         return gradients
 
-def getActivationFunctions():
+def getList():
     return [Sigmoid,Tanh,ReLU,LeakyReLU,Softmax]

@@ -16,6 +16,10 @@ def addBias(nn, array):
     bias = 1 if nn.useBias else 0
     return numpy.array(array+[bias],ndmin=2)
 
+def getList():
+    return [StochasticGradientDecent,
+            GradientDecent]
+
 def StochasticGradientDecent(NN, input, expectedOutput):
     input = addBias(NN,input)
     expectedOutput = numpy.array(expectedOutput, ndmin=2)

@@ -1,5 +1,6 @@
 import numpy
 import math
+import json
 try:
     import DeepNeuralNetwork.activationfunction as activationfunction
 except ImportError:
@@ -28,6 +29,51 @@ class DeepNeuralNetwork:
         self.activationfunctions = (len(nodes)-2)*[activationfunction.Sigmoid]+[activationfunction.Softmax] if activations==None else activations
         self.optimization = optimizationfunction.GradientDecent if optimization == None else optimization
 
+    @staticmethod
+    def load(filename: str) -> "DeepNeuralNetwork":
+        obj = json.loads(open(filename, "r").read())
+        nn = DeepNeuralNetwork([1,1])
+        
+        nn.lr = obj["lr"]
+        nn.useBias = obj["useBias"]
+        nn.layerNormalization = obj["layerNorm"]
+        nn.optimization = optimizationfunction.getList()[obj["optimization"]]
+
+        nn.activationfunctions = []
+        for i in range(len(obj["activations"])):
+            nn.activationfunctions.append(activationfunction.getList()[obj["activations"][i]])
+
+        nn.weights = []
+        for i in range(0,len(obj["weights"]),2):
+            shape = obj["weights"][i]
+            weights = obj["weights"][i+1]
+            weights = numpy.array(weights)
+            weights.shape = shape
+            nn.weights.append(weights)
+
+        return nn
+
+    def __toJSON(self):
+        class Object(object):
+            pass
+        obj = Object()
+
+        obj.lr = self.lr
+        obj.useBias = self.useBias
+        obj.layerNorm = self.layerNormalization
+        obj.optimization = optimizationfunction.getList().index(self.optimization)
+
+        obj.activations = []
+        for i in range(len(self.activationfunctions)):
+            obj.activations.append(activationfunction.getList().index(self.activationfunctions[i]))
+
+        obj.weights = []
+        for i in range(len(self.weights)):
+            obj.weights.append(self.weights[i].shape)
+            obj.weights.append(self.weights[i].flatten().tolist())
+
+        return json.dumps(obj=obj.__dict__)
+
     def setLearningrate(self, lr:float):
         self.lr = lr
 
@@ -39,6 +85,9 @@ class DeepNeuralNetwork:
 
     def getWeights(self) -> "list[list[float]]":
         return self.weights
+
+    def toFile(self, filename: str):
+        open(filename, "w").write(self.__toJSON())
 
     def predict(self, input: "list[float]") -> "list[float]":
         input = optimizationfunction.addBias(self,input)
